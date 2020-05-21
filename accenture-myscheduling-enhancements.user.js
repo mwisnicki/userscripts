@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     2.0
+// @version     3.0
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -69,6 +69,10 @@ GM.addStyle(`
     font: initial;
     font-size: small;
     box-shadow: 2px 2px 5px 3px #0000005e;
+}
+
+.roleAccordionDescription {
+    white-space: pre-line;
 }
 
 `);
