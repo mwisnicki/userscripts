@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     3.0
+// @version     3.1
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -26,7 +26,7 @@ GM_registerMenuCommand((debug ? 'Disable' : 'Enable') + ' debug', () => {
   location.reload();
 });
 
-GM_registerMenuCommand((debug ? 'Disable' : 'Enable') + ' persistence', () => {
+GM_registerMenuCommand((persistent ? 'Disable' : 'Enable') + ' persistence', () => {
   GM_setValue('persistent', !persistent);
   location.reload();
 });
