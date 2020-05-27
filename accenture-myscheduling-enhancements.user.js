@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     3.2
+// @version     4
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -44,7 +44,7 @@ const roles = persistent && GM_getValue('roles', {}) || {};
 
 GM.addStyle(`
 
-.GM_injected.endDate {
+.GM_injected.endDate, .GM_injected.createDate {
     color: #0275d8;
     font-size: 0.8em;
 }
@@ -96,6 +96,7 @@ function updateRow(roleRow) {
 
     const id = idElement.innerText;
     const durationCell = getElementByXPath(".//span[contains(text(),'Duration')]/..", roleRow);
+    const startDateCell = getElementByXPath(".//span[contains(text(),'Start Date')]/..", roleRow);
     const favoriteCell = getElementByXPath(".//favorite-icon/..", roleRow);
     const source = sources[id];
     const role = roles[id];
@@ -106,11 +107,20 @@ function updateRow(roleRow) {
       idElement.insertAdjacentHTML('beforeend', `<div class="GM_injected GM_tooltip"><pre>${JSON.stringify({ role, source }, undefined, 4)}</pre></div>`);
     }
   
-    if (source && durationCell) {
-        const endDate = new Date(source.roleEndDate);
-        const endDateStr = endDate.toISOString().split('T')[0];
+    if (source) {
+        if (durationCell) {
+            const endDate = new Date(source.roleEndDate);
+            const endDateStr = endDate.toISOString().split('T')[0];
 
-        durationCell.insertAdjacentHTML('beforeend', `<div class="GM_injected endDate">${endDateStr}</div>`);
+            durationCell.insertAdjacentHTML('beforeend', `<div class="GM_injected endDate" title="End date">${endDateStr}</div>`);
+        }
+
+        if (startDateCell) {
+            const createDate = new Date(source.createDate);
+            const createDateStr = createDate.toISOString().split('T')[0];
+
+            startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate" title="Create date">${createDateStr}</div>`);
+        }
     } else {
         console.error("Missing source for %s", id);
     }
