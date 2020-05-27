@@ -2,13 +2,13 @@
 // @name        Accenture MyScheduling enhancements
 // @description Shows more information in search results
 // @namespace   https://openuserjs.org/users/marwis84
-// @match       https://mysched.accenture.com/me
-// @match       https://mysched.accenture.com/me/*
+// @match       https://mysched.accenture.com/
+// @match       https://mysched.accenture.com/*
 // @grant       GM.addStyle
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     3.1
+// @version     3.2
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
