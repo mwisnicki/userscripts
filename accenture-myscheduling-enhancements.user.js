@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     4
+// @version     5
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -71,7 +71,7 @@ GM.addStyle(`
     box-shadow: 2px 2px 5px 3px #0000005e;
 }
 
-.roleAccordionDescription {
+.roleAccordionDescription, #roleDesc {
     white-space: pre-line;
 }
 
@@ -98,6 +98,7 @@ function updateRow(roleRow) {
     const durationCell = getElementByXPath(".//span[contains(text(),'Duration')]/..", roleRow);
     const startDateCell = getElementByXPath(".//span[contains(text(),'Start Date')]/..", roleRow);
     const favoriteCell = getElementByXPath(".//favorite-icon/..", roleRow);
+    const roleStatusCell = getElementByXPath(".//span[contains(text(),'Role Status')]/..", roleRow);
     const source = sources[id];
     const role = roles[id];
   
@@ -108,14 +109,14 @@ function updateRow(roleRow) {
     }
   
     if (source) {
-        if (durationCell) {
+        if (durationCell && source.roleEndDate) {
             const endDate = new Date(source.roleEndDate);
             const endDateStr = endDate.toISOString().split('T')[0];
 
             durationCell.insertAdjacentHTML('beforeend', `<div class="GM_injected endDate" title="End date">${endDateStr}</div>`);
         }
 
-        if (startDateCell) {
+        if (startDateCell && source.createDate) {
             const createDate = new Date(source.createDate);
             const createDateStr = createDate.toISOString().split('T')[0];
 
@@ -125,8 +126,9 @@ function updateRow(roleRow) {
         console.error("Missing source for %s", id);
     }
   
+    const statusCell = favoriteCell || roleStatusCell;
     // TODO this only works if user visits main page first or persistence is enabled, otherwise TrackAssignment is not loaded
-    if (role && favoriteCell) {
+    if (role && statusCell) {
       let statusStr = "";
       if (role.AppliedDate) {
         statusStr += `<span title="Applied ${role.AppliedDate}">✉</span>`;
@@ -134,7 +136,7 @@ function updateRow(roleRow) {
       if (role.StatusSequence > 0) {
         statusStr += `<span title="Updated ${role.UpdateDate}">⏳</span>`;
       }
-      favoriteCell.insertAdjacentHTML('beforeend', `<div class="GM_injected status">${statusStr}</div>`);
+      statusCell.insertAdjacentHTML('beforeend', `<div class="GM_injected status">${statusStr}</div>`);
     }
 }
 
