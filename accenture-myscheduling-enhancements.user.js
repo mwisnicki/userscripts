@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     7
+// @version     7.1
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -130,7 +130,7 @@ function updateRow(roleRow) {
         if (roleDetailsFooter) {
           let detailsHtml = `<span class="GM_injected">`;
           if (source.level) {
-            const sourceLevels = source.level.map(l => levels[l]).sort((a,b) => a-b);
+            const sourceLevels = source.level.map(l => levels[l]).sort((a,b) => a.index-b.index);
             const levelTo = sourceLevels[0];
             const levelFrom = sourceLevels[sourceLevels.length - 1];
             detailsHtml += ` | Levels: <span class="text-content"><span title="${levelFrom.LevelGroupName}">${levelFrom.LevelName}</span>-<span title="${levelTo.LevelGroupName}">${levelTo.LevelName}</span></span>`;
