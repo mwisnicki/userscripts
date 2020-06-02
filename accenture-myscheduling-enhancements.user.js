@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     5
+// @version     7
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -20,6 +20,8 @@
 const debug = GM_getValue('debug', false);
 // persisting data makes it available regardless of whether you visited main page but at the risk of showing stale data
 const persistent = GM_getValue('persistent', true);
+
+const showLCR = GM_getValue('showLCR', false);
 
 GM_registerMenuCommand((debug ? 'Disable' : 'Enable') + ' debug', () => {
   GM_setValue('debug', !debug);
@@ -37,6 +39,7 @@ GM_registerMenuCommand((persistent ? 'Disable' : 'Enable') + ' persistence', () 
 
 const sources = persistent && GM_getValue('sources', {}) || {};
 const roles = persistent && GM_getValue('roles', {}) || {};
+const levels = persistent && GM_getValue('levels', {}) || {};
 
 
 // Styles
@@ -99,6 +102,7 @@ function updateRow(roleRow) {
     const startDateCell = getElementByXPath(".//span[contains(text(),'Start Date')]/..", roleRow);
     const favoriteCell = getElementByXPath(".//favorite-icon/..", roleRow);
     const roleStatusCell = getElementByXPath(".//span[contains(text(),'Role Status')]/..", roleRow);
+    const roleDetailsFooter = getElementByXPath(".//*[text()[contains(.,'Client:')]]", roleRow);
     const source = sources[id];
     const role = roles[id];
   
@@ -121,6 +125,21 @@ function updateRow(roleRow) {
             const createDateStr = createDate.toISOString().split('T')[0];
 
             startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate" title="Create date">${createDateStr}</div>`);
+        }
+      
+        if (roleDetailsFooter) {
+          let detailsHtml = `<span class="GM_injected">`;
+          if (source.level) {
+            const sourceLevels = source.level.map(l => levels[l]).sort((a,b) => a-b);
+            const levelTo = sourceLevels[0];
+            const levelFrom = sourceLevels[sourceLevels.length - 1];
+            detailsHtml += ` | Levels: <span class="text-content"><span title="${levelFrom.LevelGroupName}">${levelFrom.LevelName}</span>-<span title="${levelTo.LevelGroupName}">${levelTo.LevelName}</span></span>`;
+          }
+          if (showLCR && source.lcrMultiplier) {
+            detailsHtml += ` | LCR: <span class="text-content">${source.lcrMultiplier}</span>`
+          }
+          detailsHtml += `</span>`;
+          roleDetailsFooter.insertAdjacentHTML('beforeend', detailsHtml);
         }
     } else {
         console.error("Missing source for %s", id);
@@ -160,9 +179,16 @@ function hookXHR() {
     if (_xhrOpen._unhooked) {
         _xhrOpen = _xhrOpen._unhooked;
     }
+    let refreshing = false;
     function refresh() {
-        // TODO detect when table is loaded
-        setTimeout(() => updateTable(sources), 1000);
+        if (!refreshing) {
+            refreshing = true;
+            // TODO detect when table is loaded
+            setTimeout(() => {
+                updateTable(sources);
+                refreshing = false;
+            }, 1000);
+        }
     }
     XMLHttpRequest.prototype.open = function (method, url) {
         if (url == "https://mysched-searchandmatchsvc.accenture.com/api/search/" ||
@@ -173,11 +199,11 @@ function hookXHR() {
                     if (hit._source && hit._source.id) {
                         const id = hit._source.id;
                         sources[id] = Object.assign(sources[id] || {}, hit._source);
-                        GM_setValue('sources', sources);
                     }
                 }
+                GM_setValue('sources', sources);
                 refresh();
-            });
+            }, { once: true });
         }
         if (url.startsWith("https://myschedulingsvc.accenture.com/services/ReplyToRoleDetails-service/RoleFavorite") ||
             url.startsWith("https://myschedulingsvc.accenture.com/services/TrackAssignment-service/TrackAssignment")) {
@@ -187,17 +213,31 @@ function hookXHR() {
                     if (v.RoleKey) {
                         const id = v.RoleKey;
                         roles[id] = Object.assign(roles[id] || {}, v);
-                        GM_setValue('roles', roles);
                         // odata endpoints have different schemas, for now just map what we need to sources
                         sources[id] = Object.assign(sources[id] || {}, {
                             id: id,
                             roleEndDate: v.EndDate
                         });
-                        GM_setValue('sources', sources);
                     }
                 }
+                GM_setValue('roles', roles);
+                GM_setValue('sources', sources);
                 refresh();
-            });
+            }, { once: true });
+        }
+        if (url.startsWith("https://myschedulingsvc.accenture.com/services/Levels-service/LevelList")) {
+            this.addEventListener("load", function (e) {
+                const response = JSON.parse(this.responseText);
+                let i = 0;
+                for (const v of response) {
+                    if (v.LevelCode) {
+                        v.index = i++;
+                        levels[v.LevelCode] = v;
+                    }
+                }
+                GM_setValue('levels', levels);
+                refresh();
+            }, { once: true });
         }
         return _xhrOpen.apply(this, arguments);
     }
