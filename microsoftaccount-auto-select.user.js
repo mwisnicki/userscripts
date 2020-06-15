@@ -4,7 +4,7 @@
 // @match       https://login.microsoftonline.com/*
 // @run-at      document-idle
 // @grant       none
-// @version     1.0
+// @version     1.1
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -27,8 +27,8 @@ function selectUser(options) {
 
   if (matching.length = 1) {
     const id = matching[0];
-    //url.searchParams.append('domain_hint', id.domain);
     console.log(`Matched redirect_uri=${redirect_uri} with id=${id.id}.`);
+    //url.searchParams.append('domain_hint', id.domain);
     //document.location.replace(url.href);
     id.element.click();
   }
@@ -43,7 +43,7 @@ function waitForOptions(delay, elapsed) {
       if (elapsed > 5000) {
         console.error('timeout');
       } else {
-        waitForOptions(elapsed + delay);
+        waitForOptions(delay, elapsed + delay);
       }
     }
   }, delay);
