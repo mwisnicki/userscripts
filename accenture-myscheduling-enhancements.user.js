@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     7.1
+// @version     8
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -147,13 +147,16 @@ function updateRow(roleRow) {
   
     const statusCell = favoriteCell || roleStatusCell;
     // TODO this only works if user visits main page first or persistence is enabled, otherwise TrackAssignment is not loaded
-    if (role && statusCell) {
+    if (statusCell) {
       let statusStr = "";
-      if (role.AppliedDate) {
+      if (role && role.AppliedDate) {
         statusStr += `<span title="Applied ${role.AppliedDate}">✉</span>`;
       }
-      if (role.StatusSequence > 0) {
+      if (role && role.StatusSequence > 0) {
         statusStr += `<span title="Updated ${role.UpdateDate}">⏳</span>`;
+      }
+      if (source && (source.roleIsSold == true || source.roleIsSold == "true")) {
+        statusStr += `<span title="Sold">💰</span>`;
       }
       statusCell.insertAdjacentHTML('beforeend', `<div class="GM_injected status">${statusStr}</div>`);
     }
