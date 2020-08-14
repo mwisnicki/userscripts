@@ -78,6 +78,14 @@ GM.addStyle(`
     white-space: pre-line;
 }
 
+.createDate.GM_fresh {
+    color: black;
+    font-weight: bold;
+    background: #ff260061;
+    border-radius: 6px;
+    padding-left: 6px;
+}
+
 `);
 
 
@@ -106,6 +114,8 @@ function updateRow(roleRow) {
     const source = sources[id];
     const role = roles[id];
   
+    const beforeOneWeek = new Date(new Date().getTime() - 60 * 60 * 24 * 7 * 1000);
+  
     if (debug) {
       roleRow.GM_data = { source, role };
       idElement.classList.add("GM_ht")
@@ -123,8 +133,9 @@ function updateRow(roleRow) {
         if (startDateCell && source.createDate) {
             const createDate = new Date(source.createDate);
             const createDateStr = createDate.toISOString().split('T')[0];
+            const isFresh = createDate.getTime() > beforeOneWeek.getTime();
 
-            startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate" title="Create date">${createDateStr}</div>`);
+            startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate ${isFresh ? 'GM_fresh' : ''}" title="Create date">${createDateStr}</div>`);
         }
       
         if (roleDetailsFooter) {
