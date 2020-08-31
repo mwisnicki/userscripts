@@ -8,7 +8,7 @@
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_registerMenuCommand
-// @version     9
+// @version     10
 // @author      mwisnicki@gmail.com
 // ==/UserScript==
 
@@ -86,6 +86,15 @@ GM.addStyle(`
     padding-left: 6px;
 }
 
+.createDate.GM_fresh30d {
+    background: #ffbbaf61;
+}
+
+.createDate.GM_stale {
+    color: #cbcbcb;
+    background: inherit;
+}
+
 `);
 
 
@@ -96,6 +105,9 @@ function getElementByXPath(path, parent) {
     return document.evaluate(path, parent || document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
+function dateDayDiff(first, second) {
+    return Math.round((second-first)/(1000*60*60*24));
+}
 
 // Logic
 // =====
@@ -114,8 +126,6 @@ function updateRow(roleRow) {
     const source = sources[id];
     const role = roles[id];
   
-    const beforeOneWeek = new Date(new Date().getTime() - 60 * 60 * 24 * 7 * 1000);
-  
     if (debug) {
       roleRow.GM_data = { source, role };
       idElement.classList.add("GM_ht")
@@ -133,9 +143,16 @@ function updateRow(roleRow) {
         if (startDateCell && source.createDate) {
             const createDate = new Date(source.createDate);
             const createDateStr = createDate.toISOString().split('T')[0];
-            const isFresh = createDate.getTime() > beforeOneWeek.getTime();
+            const ageDays = dateDayDiff(createDate, new Date());
+            let freshClasses = '';
+            if (ageDays < 7)
+              freshClasses = 'GM_fresh GM_fresh7d';
+            else if (ageDays < 30)
+              freshClasses = 'GM_fresh GM_fresh30d';
+            else if (ageDays > 100)
+              freshClasses = 'GM_fresh GM_stale';
 
-            startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate ${isFresh ? 'GM_fresh' : ''}" title="Create date">${createDateStr}</div>`);
+            startDateCell.insertAdjacentHTML('beforeend', `<div class="GM_injected createDate ${freshClasses}" title="Create date - ${ageDays} days old">${createDateStr}</div>`);
         }
       
         if (roleDetailsFooter) {
