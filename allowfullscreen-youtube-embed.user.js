@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name        Allow full screen on embedded Youtube
 // @namespace   mwisnicki@gmail.com
-// @website     https://github.com/mwisnicki/userscripts/blob/master/allowfullscreen-youtube-embed.user.js
+// @homepage     https://github.com/mwisnicki/userscripts/blob/master/allowfullscreen-youtube-embed.user.js
 // @match       *://*/*
 // @grant       none
-// @version     3
+// @version     4
 // @author      mwisnicki@gmail.com
 // @description ViolentMonkey script
 // ==/UserScript==
