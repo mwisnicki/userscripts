@@ -1,15 +1,21 @@
 // ==UserScript==
 // @name        Allow full screen on embedded Youtube
 // @namespace   mwisnicki@gmail.com
+// @website     https://github.com/mwisnicki/userscripts/blob/master/allowfullscreen-youtube-embed.user.js
 // @match       *://*/*
 // @grant       none
-// @version     1.0
+// @version     2
 // @author      mwisnicki@gmail.com
-// @description 3/8/2020, 10:42:28 PM
+// @description ViolentMonkey script
 // ==/UserScript==
 
+const SELECTOR = [
+  `iframe[src^="https://www.youtube.com/embed/"]:not([allowfullscreen])`,
+  `iframe[src^="https://youtube.com/embed/"]:not([allowfullscreen])`
+].join(', ');
+
 function fixVideos() {
-  const iframes = document.body.querySelectorAll('iframe[src^="https://www.youtube.com/embed/"]:not([allowfullscreen])')
+  const iframes = document.body.querySelectorAll(SELECTOR)
   for (const iframe of iframes) {
     iframe.setAttribute("allowfullscreen","");
     // force reload
