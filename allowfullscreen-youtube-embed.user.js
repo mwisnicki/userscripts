@@ -18,11 +18,7 @@ const URLs = [
 const SELECTOR = URLs.map(url => `iframe[src^="${url}"]:not([allowfullscreen])`).join(', ');
 
 function forceReloadIframe(iframe) {
-  // force reload
-  // TODO maybe there's a way to refresh state without reload?
-  const span = document.createElement("span");
-  iframe.replaceWith(span);
-  span.replaceWith(iframe);
+  iframe.src = iframe.src;
 }
 
 function fixVideos() {
