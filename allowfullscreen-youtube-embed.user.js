@@ -17,7 +17,7 @@ const URLs = [
 
 const SELECTOR = URLs.map(url => `iframe[src^="${url}"]:not([allowfullscreen])`).join(', ');
 
-function forceReloadIframe(iframe) {
+function reloadIframe(iframe) {
   iframe.src = iframe.src;
 }
 
@@ -25,7 +25,7 @@ function fixVideos() {
   const iframes = document.body.querySelectorAll(SELECTOR)
   for (const iframe of iframes) {
     iframe.setAttribute("allowfullscreen","");
-    forceReloadIframe(iframe);
+    reloadIframe(iframe);
     console.log("Forced Youtube allowfullscreen on %o", iframe);
   }
 }
