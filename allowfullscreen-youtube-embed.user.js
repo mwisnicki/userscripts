@@ -4,7 +4,7 @@
 // @homepage    https://github.com/mwisnicki/userscripts/blob/master/allowfullscreen-youtube-embed.user.js
 // @match       *://*/*
 // @grant       none
-// @version     5
+// @version     6
 // @author      mwisnicki@gmail.com
 // @description ViolentMonkey script
 // ==/UserScript==
